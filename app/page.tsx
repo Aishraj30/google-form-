@@ -16,19 +16,32 @@ export default function LeadTest() {
     });
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log("Lead Submitted:", form);
+    try {
+      const response = await fetch("/api/leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
 
-    alert("Lead submitted successfully!");
-
-    // Example API request
-    // fetch("/api/leads", {
-    //   method: "POST",
-    //   headers: { "Content-Type": "application/json" },
-    //   body: JSON.stringify(form),
-    // });
+      if (response.ok) {
+        alert("Lead submitted successfully!");
+        setForm({
+          name: "",
+          phone: "",
+          email: "",
+          source: "google_ads_test",
+        });
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.error || "Failed to submit lead"}`);
+      }
+    } catch (error) {
+      console.error("Error submitting lead:", error);
+      alert("Failed to submit lead. Please try again.");
+    }
   };
 
   return (
